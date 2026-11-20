@@ -304,3 +304,14 @@ After the user confirmed the existing local folder should become the canonical G
 - A GitHub compare request using local base commit `2e44a75` against this repository's `main` returned 404. Therefore that local commit is not currently resolvable as a commit in this GitHub repository; no common history has been established.
 - Do not infer that the local and GitHub trees are identical just because file paths overlap. Compare actual files and histories before reconciliation.
 - Next user-side step should remain read-only: check available disk space and current folder size so a full external backup can be planned. Do not modify Git remotes or the working tree yet.
+
+
+## 17. D: and E: inspected files transfer remains outstanding — 2026-11-20
+
+User clarified that transferring the files previously inspected on both D: and E: drives is still unfinished and must be included in the migration. Do not treat the Laravel project folder sync as the only transfer task. Maintain a separate inventory/manifest of inspected D: and E: source paths, destination paths, sizes, file counts, and verification results before moving/copying. Preserve source files until destination copies are verified (counts, sizes, and preferably hashes for critical files). Avoid duplicate/ambiguous overwrites; resolve conflicts before copying.
+
+Current local storage diagnostics:
+- Laravel project folder at `/mnt/d/DoR-Website-Backup/Laravel13-Upgrade`: 17 GB excluding `.git`.
+- D: mounted at `/mnt/d`: 463 GB total, 427 GB used, 37 GB available (93% used).
+- Backup parent `/mnt/d/DoR-Website-Backup` exists.
+- Do not create a second full 17 GB backup on D: without checking capacity and planning. First inspect E: available space and retrieve/compile the prior D:/E: inspected-path inventory. Do not start bulk transfers yet.
