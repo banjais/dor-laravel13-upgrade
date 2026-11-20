@@ -4395,3 +4395,22 @@ body {
 @media (max-width: 767.98px) {
     .main-footer .footer-social-links { margin-bottom: 12px; }
 }
+
+/* Final switch-plate height and subtle grey finish */
+@media (min-width: 992px) {
+    #cssmenu .butlike,
+    #cssmenu .back-btn,
+    .nav-wrap .navbar-collapse .back-btn,
+    #navbarSupportedContent .back-btn {
+        padding: 9px 11px !important;
+        background-color: #e9edf1 !important;
+        border-color: #d5dce3 !important;
+    }
+
+    #cssmenu .butlike:hover,
+    #cssmenu .back-btn:hover,
+    .nav-wrap .navbar-collapse .back-btn:hover,
+    #navbarSupportedContent .back-btn:hover {
+        background-color: #e1e7ec !important;
+    }
+}

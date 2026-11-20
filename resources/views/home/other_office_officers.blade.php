@@ -221,20 +221,6 @@ $otherOfficeOfficers = collect([
                         @endif
                     </a>
 
-                    @if ($officer->home_description)
-                        @if ($hasLongDescription)
-                            <details class="other-officer-description">
-                                <summary>{{ $languageId == 1 ? 'थप हेर्नुहोस्' : 'Show More' }}</summary>
-                                <div class="other-officer-full-description">
-                                    {!! $cleanOfficerDescription !!}
-                                </div>
-                            </details>
-                        @else
-                            <div class="other-officer-short-description">
-                                {!! $cleanOfficerDescription !!}
-                            </div>
-                        @endif
-                    @endif
                 </div>
             </div>
         @endforeach

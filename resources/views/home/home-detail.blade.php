@@ -29,10 +29,16 @@
                                 <h2>{{ $homeData->home_heading }}</h2>
                                 <div class="divider"></div>
                             </div>
-                            @if ($should_exclude_download)
+                            @if (
+                                $should_exclude_download &&
+                                !empty($homeData->home_attachment) &&
+                                is_file(public_path('uploads/pages/' . $homeData->home_attachment))
+                            )
                                 <div class="text-left mb-3">
                                     <img
-                                        src="{{ '/uploads/pages/' . $homeData->home_attachment }}" width="150" />
+                                        src="{{ asset('uploads/pages/' . $homeData->home_attachment) }}"
+                                        width="150"
+                                        alt="{{ $homeData->home_heading }}" />
                                 </div>
                             @endif
                             <div>{!! $homeData->home_description !!}</div>

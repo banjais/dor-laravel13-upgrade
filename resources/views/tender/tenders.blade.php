@@ -9,6 +9,8 @@
     $download = $languageId == 1 ? 'डाउनलोड गर्नुहोस्' : 'Download';
     $fileNotfound = $languageId == 1 ? 'फाइल उपलब्ध छैन' : 'File Not found.';
     $notAvailableMessage = $languageId == 1 ? 'बोलपत्र/दरभाउपत्र उपलब्ध छैन ।' : 'Tender Notices are not available.';
+    $from = $languageId == 1 ? 'म्याद समाप्त मिति देखी' : 'Expiry date from';
+    $to = $languageId == 1 ? 'सम्म' : 'to';
     $linkToHometenders = $languageId == 1 ? 'Click here to view all tenders.' : 'Click here to view all tenders.';
     @endphp
 
