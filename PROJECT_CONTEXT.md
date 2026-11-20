@@ -177,3 +177,34 @@ Install and test required tools locally first, then reproduce the verified setup
 - Run targeted tests and relevant asset/view checks.
 - Record commit SHA, changed files, tests, results, and remaining issues here after meaningful milestones.
 - Do not commit secrets, local environment files, database dumps, or generated private data.
+
+
+## 11. User-confirmed requests and working decisions
+
+Keep this section as a decision log, not just a technical status summary. It helps future ChatGPT sessions remember what the user explicitly requested, clarified, approved, or rejected. Record the date when known. Distinguish confirmed decisions from ideas still under discussion. Do not silently reinterpret a request or mark a proposal as approved.
+
+### Confirmed working preferences
+
+- The user wants continuity across ChatGPT chats; consult this file before asking them to repeat project background or previously confirmed decisions.
+- Give simple Romanized Nepali explanations and clearly labelled terminal steps (WSL Ubuntu / Windows PowerShell).
+- Avoid breaking work into unnecessary long pauses or asking for very large terminal outputs. Ask for the smallest useful output.
+- Do not make broad changes when the user requested a specific adjustment. In particular, when the user says a component's height should match another, do not change unrelated dimensions.
+- Preserve the existing homepage structure and make focused incremental changes.
+- For homepage styling, match the Head Office appearance where requested; the “Switch to Head Office” plate should have the same height, with a slightly grey rather than white background.
+- Keep user-confirmed constraints and corrections even if a later chat starts without the original conversation.
+
+### Explicit project decisions to preserve
+
+- The upgrade repository is `banjais/dor-laravel13-upgrade`, branch `main`; do not confuse it with the older `banjais/dor` repository.
+- The user confirmed the GitHub repository is Public.
+- GitHub's ChatGPT Codex Connector installation is configured for **Only select repositories**, with `banjais/dor-laravel13-upgrade` selected.
+- The connector installation page reports read access to checks, commit statuses, and metadata, and read/write access to actions, code, issues, pull requests, and workflows.
+- The user wants relevant prior requests and confirmations recorded here so future sessions can remember them and work more consistently.
+
+### Decision-log maintenance
+
+- Add new user-confirmed requirements, corrections, and approvals here as work progresses.
+- For each important decision, record: date (if known), exact requested outcome, scope/constraints, and whether it is confirmed, pending, or rejected.
+- When a decision changes, preserve the old decision as superseded and record the new one; do not erase history that explains why code is the way it is.
+- Do not record secrets, personal sensitive information, or unnecessary private details.
+- Keep technical implementation status separate from user intent: a requested feature is not “completed” until implementation and testing are verified.
