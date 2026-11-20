@@ -327,3 +327,48 @@ Latest WSL read-only diagnostics:
 - `D:\Dirves` and `E:\Dirve` are differently named folders; do not assume they are duplicates or rename/merge them without inspecting contents.
 - `E:\DoR-Website-Backup-Upgrade-Data` is a separate E: root folder and must be inventoried as a potential source of upgrade data before transfer.
 - Next: read-only inventory of the named user-data folders on D: and E: (names, sizes, file counts, timestamps); exclude Windows protected/system entries. Compare manifests and available destinations before any copy. Preserve all source files until destination verification.
+
+
+## 19. Recovered 2026-11-20 D:/E: inspection details (approximately 3 hours; do not repeat or lose)
+
+The user spent approximately three hours inspecting D: and E: data on 2026-11-20. The following findings were recovered from that session and are authoritative context.
+
+### GitHub staging / source boundaries
+- Staging folder: `D:\DoR-Website-Backup\dor-laravel13-upgrade-github-stage`; at an earlier inspection it was about 20 MB, 1,814 files / 476 directories, with 13 MB under `public`.
+- It was pushed to private GitHub repo `banjais/dor-laravel13-upgrade`, branch `main`; later push report recorded commit `daa289f`, 56.87 MiB / 2,969 files, then a second push reported “Everything up-to-date.” Treat these as distinct recorded checkpoints; do not conflate their counts.
+- GitHub repo contains code/history only. Private uploads and database dumps were excluded from the GitHub push. Original GitLab repo and live VM were not changed.
+- No uploads, SQL backups, or private user data should be pushed to GitHub.
+
+### Active local Laravel project and upload storage
+- Active local project: `D:\DoR-Website-Backup\Laravel13-Upgrade` (WSL: `/mnt/d/DoR-Website-Backup/Laravel13-Upgrade`).
+- Active project `public/uploads` is a real D: directory, approximately 16 GB, with 14,926 files.
+- Its major subfolders/sizes at inspection: notice 6.3 GB; publication 4.0 GB; circular 1.8 GB; pages 1.5 GB; ckfiles 556 MB; banner 519 MB; gallery 339 MB; download 337 MB.
+- Also present locally: `uploads-x` approximately 3.3 MB and `uploads_tmp` approximately 868 KB.
+- `uploads002` is a symlink to `E:\DoR-Website-Backup-Upgrade-Data\public\uploads002` (about 7.8 GB).
+- `uploads_20220429b4_existing_working` is a symlink to `E:\DoR-Website-Backup-Upgrade-Data\public\uploads_20220429b4_existing_working` (about 7.4 GB).
+- Both E: symlink targets exist. Do not move, rename, replace, or break either symlink until application references and active use have been verified.
+
+### E: backup uploads comparison
+- Comparison source: `E:\DoR-Website-Backup-Upgrade-Data\public\uploads`.
+- E: copy contained 15,165 files, versus 14,926 in active D: uploads.
+- E: major folders observed: notice 6.3 GB; publication 4.9 GB; circular 1.8 GB; pages 1.5 GB; ckfiles 556 MB; banner 560 MB; tender 101 MB; press 1.9 MB; staffs about 295 MB.
+- Relative-path comparison: E-only 264 files; D-only 25 files. E-only breakdown: publication 123, tender 104, notice 29, press 3, testimonial 2, pages 1, ckfiles 1, banner 1. D-only breakdown: office_chiefs 10, pages 5, download 3, banner 4, staffs 1, circular 1, album 1.
+- A sample of E-only material included banner assets, ckfiles/images/bumn.jpg, notice JPG/PDFs, pages/Documents_1734781862.jpg, press PDFs/JPGs, and publication PDFs.
+- These are not safe to bulk-merge blindly: the folder versions differ, and both E-only and D-only files exist. Preserve both sides and compare conflicts before copying. No transfer/deletion was done in this inspection session.
+
+### Database backups / PWA assets
+- Database backup files inspected by path: `D:\DoR-Website-Backup\Database\dor.sql` (about 61,300 KB) and `dor_web.sql` (about 18,200 KB). These are private database backups; never commit to GitHub. Do not restore/import/overwrite without explicit approval and database-target verification.
+- Original PWA assets were located under active project `public\assets\pwa`, including QR, emblem, icons, and logo-review materials. Preserve these source assets.
+
+### Publication upload implementation
+- Inspected `app\Http\Controllers\Admin\PublicationController.php`.
+- Publication uploads are stored at relative path `uploads/publication/`; accepted extensions jpg/jpeg/pdf/ppt/pptx; max file size 130 MB; generated names use `publication_<time>.<ext>`.
+- Project-root `uploads/` does not exist; actual active folder is `public\uploads\publication`.
+- At that checkpoint, local server was `/usr/bin/php8.5 -S 0.0.0.0:8000 .../server.php`, working directory `.../Laravel13-Upgrade/public`. User reported no code, file, or database changes from the inspection.
+
+### Transfer decisions / safeguards
+- User accepted an inspect-first plan to consolidate only necessary uploads/database backups from E: to D: while retaining old backups; later explicitly confirmed no files had yet been moved or deleted and E: originals remained intact.
+- Preserve current D: active files and E: originals. No bulk copy, merge, move, delete, overwrite, symlink change, database restore, or production action without a verified manifest and explicit approval.
+- The later drive-space check: D: 463 GB total / 37 GB free (93% used); E: 469 GB total / 117 GB free (76% used). E: has more available space, but this alone does not decide transfer destinations.
+- The latest 2026-11-20 root inventory also showed D: `Dirves`, `DoR-Website-Backup`, `Recovery`, `tmp`, root-level `ChatbotSettingController.php`; E: `Dirve`, `DoR-Website-Backup`, `DoR-Website-Backup-Upgrade-Data`. Do not assume `Dirves` and `Dirve` are the same folder.
+- Earlier read-only inspection covered the active upload folders and E: backup upload comparison above. Do not ask the user to repeat those three hours of work. Only request new read-only output for genuinely uninspected remaining directories or to verify a planned transfer.
