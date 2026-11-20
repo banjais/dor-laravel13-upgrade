@@ -372,3 +372,18 @@ The user spent approximately three hours inspecting D: and E: data on 2026-11-20
 - The later drive-space check: D: 463 GB total / 37 GB free (93% used); E: 469 GB total / 117 GB free (76% used). E: has more available space, but this alone does not decide transfer destinations.
 - The latest 2026-11-20 root inventory also showed D: `Dirves`, `DoR-Website-Backup`, `Recovery`, `tmp`, root-level `ChatbotSettingController.php`; E: `Dirve`, `DoR-Website-Backup`, `DoR-Website-Backup-Upgrade-Data`. Do not assume `Dirves` and `Dirve` are the same folder.
 - Earlier read-only inspection covered the active upload folders and E: backup upload comparison above. Do not ask the user to repeat those three hours of work. Only request new read-only output for genuinely uninspected remaining directories or to verify a planned transfer.
+
+## 20. User confirms D: as the final location for required DoR files — 2026-11-20
+
+User explicitly instructed: “D: ma file rakhe kam pura garam” — finish the file-placement/consolidation work by keeping the required DoR files on D:.
+
+Carry forward the three-hour D:/E: inspection; do not ask the user to repeat it. Confirmed working target is the active project upload directory:
+- Destination: `D:\\DoR-Website-Backup\\Laravel13-Upgrade\\public\\uploads`
+- E: comparison source: `E:\\DoR-Website-Backup-Upgrade-Data\\public\\uploads`
+- A refined comparison result recovered from the inspection conversation reported 262 E-only files totaling approximately 0.996 GB and 25 D-only files totaling approximately 8.41 MB. Preserve the D-only files and add missing E-only content; do not replace the D directory wholesale. Section 19 preserves an earlier comparison checkpoint of 264 E-only files; retain both historical counts and use the refined 262-file result as the latest stated comparison unless new evidence shows otherwise.
+- The user wants required files consolidated on D:. The E: originals must remain untouched until the D: destination has been copied and verified.
+- The two existing project symlinks `uploads002` and `uploads_20220429b4_existing_working` currently point to E:. They are part of the D: consolidation scope to assess and, if included in the user's intended required data set, copy to D: and then safely repoint only after content verification and application-reference checks. Never break or delete the E: originals during this process.
+- D: currently has only about 37 GB free; E: has about 117 GB free. Check the exact required data size and available D: capacity before copying. Do not begin a transfer that can fill D: or interrupt the live local site.
+- Database dumps remain private data and are not for GitHub. Keep both inspected SQL backups intact; do not import/restore without explicit database-target approval.
+- No local file copy has been performed by ChatGPT. Ordinary chat/GitHub connector cannot directly operate the user's WSL filesystem. Do not claim the D: transfer is complete until the user-side copy and verification outputs confirm it.
+- Next action: use the recovered inventory and perform a controlled, non-destructive copy/merge to D:, preserving all source files, checking conflicts, file counts, sizes, and hashes for important files. Then update application symlinks only after verifying destination and references. Keep the live server running; avoid destructive or broad commands.
