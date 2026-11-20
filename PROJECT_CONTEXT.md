@@ -275,3 +275,21 @@ Next safe steps:
 4. Create and verify a complete local backup outside the repository before any operation that changes the working tree.
 5. Establish a safe allowlist of intended source files; explicitly exclude `.env*`, backup artifacts, dumps, uploads/private data, temporary outputs, and credentials.
 6. Only after user intent and repository relationship are clear, configure a non-destructive sync path. Never claim local PC sync until verified.
+
+
+## 15. User confirms canonical local working folder — 2026-11-20
+
+User explicitly confirmed that the existing local WSL folder
+`/mnt/d/DoR-Website-Backup/Laravel13-Upgrade` (Windows:
+`D:\DoR-Website-Backup\Laravel13-Upgrade`) is intended to become the main local working folder for the GitHub upgrade repository
+`banjais/dor-laravel13-upgrade` on branch `main`.
+
+This confirms the desired end state, but does NOT authorize destructive replacement of the current local working tree. The local folder currently has a GitLab `origin`, branch `master`, base commit `2e44a75`, and extensive uncommitted work. Proceed with a preservation-first migration:
+- Keep all existing local work intact.
+- Do not overwrite or discard any local changes.
+- Do not immediately replace the GitLab remote or run pull/reset/clean/checkout/merge.
+- First inspect GitHub main's current commit and tree, then compare the local base/history and identify the exact source files that belong in the GitHub working copy.
+- Create and verify a complete backup outside the repository before any local working-tree mutation.
+- Keep `.env*`, credentials, database dumps, private uploads, backup copies, temporary outputs, and other sensitive/local-only files out of GitHub.
+- Plan a non-destructive integration so the local site can continue running. Only report PC sync after the user runs the safe local sync operation and the resulting branch/status/commit are verified.
+- Desired final state: this same local folder tracks GitHub `main`; the user can keep the local development server/browser running to inspect the site while development proceeds.
