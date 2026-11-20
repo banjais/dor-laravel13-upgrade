@@ -1,0 +1,304 @@
+<?php
+
+namespace App\Services\Chatbot;
+
+use App\Models\ChatbotKnowledgeSource;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
+
+class AppSheetKnowledgeSyncService
+{
+    private const MAX_ROWS = 1000;
+    private const MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
+
+    private const REGIONS = [
+        'global' => 'www.appsheet.com',
+        'asia_pacific' => 'asia-southeast.appsheet.com',
+        'eu' => 'eu.appsheet.com',
+    ];
+
+    public function sync(
+        ChatbotKnowledgeSource $source,
+        ChatbotKnowledgeIndexer $indexer
+    ): array {
+        $newPath = null;
+
+        try {
+            if ($source->source_type !== 'appsheet') {
+                return $this->fail($source, 'This source is not an AppSheet source.');
+            }
+
+            if (!$source->is_enabled) {
+                return $this->fail($source, 'Enable this source before syncing.');
+            }
+
+            $config = $source->auth_config;
+            $config = is_array($config) ? $config : [];
+
+            $appId = trim((string) ($config['app_id'] ?? ''));
+            $tableName = trim((string) ($config['table_name'] ?? ''));
+            $accessKey = trim((string) ($config['access_key'] ?? ''));
+            $region = (string) ($config['region'] ?? 'global');
+
+            if ($appId === '' || $tableName === '' || $accessKey === '') {
+                return $this->fail(
+                    $source,
+                    'App ID, Table Name and Application Access Key are required.'
+                );
+            }
+
+            if (!isset(self::REGIONS[$region])) {
+                return $this->fail($source, 'Invalid AppSheet API region.');
+            }
+
+            // Host is selected from a fixed allowlist. User input cannot
+            // change the destination host or redirect the API request.
+            $host = self::REGIONS[$region];
+
+            $endpoint = 'https://' . $host
+                . '/api/v2/apps/' . rawurlencode($appId)
+                . '/tables/' . rawurlencode($tableName)
+                . '/Action';
+
+            $response = Http::acceptJson()
+                ->withHeaders([
+                    'ApplicationAccessKey' => $accessKey,
+                ])
+                ->connectTimeout(10)
+                ->timeout(90)
+                ->withOptions([
+                    'allow_redirects' => false,
+                ])
+                ->post($endpoint, [
+                    'Action' => 'Find',
+                    'Properties' => [
+                        'Locale' => 'en-US',
+                    ],
+                    'Rows' => [],
+                ]);
+
+            if (!$response->successful()) {
+                $status = $response->status();
+
+                $message = match (true) {
+                    in_array($status, [401, 403], true) =>
+                        'AppSheet access denied. Check API access, plan, App ID and Access Key.',
+
+                    $status === 400 =>
+                        'AppSheet rejected the request. Check App ID, Table Name and API settings.',
+
+                    $status === 404 =>
+                        'AppSheet app or table not found. Check App ID and Table Name.',
+
+                    $status === 429 =>
+                        'AppSheet request limit reached. Try again later.',
+
+                    $status >= 500 =>
+                        'AppSheet service is unavailable. Try again later.',
+
+                    default =>
+                        'AppSheet request failed (HTTP ' . $status . ').',
+                };
+
+                return $this->fail($source, $message);
+            }
+
+            $body = $response->body();
+
+            if (strlen($body) > self::MAX_RESPONSE_BYTES) {
+                return $this->fail(
+                    $source,
+                    'AppSheet response is too large (maximum 8 MB).'
+                );
+            }
+
+            $payload = $response->json();
+            $rows = is_array($payload) ? ($payload['Rows'] ?? null) : null;
+
+            if (!is_array($rows)) {
+                return $this->fail(
+                    $source,
+                    'AppSheet returned an invalid response. Check the table and API settings.'
+                );
+            }
+
+            if (count($rows) === 0) {
+                return $this->fail(
+                    $source,
+                    'No records were found in the selected AppSheet table.'
+                );
+            }
+
+            if (count($rows) > self::MAX_ROWS) {
+                return $this->fail(
+                    $source,
+                    'The table has more than 1,000 records. Use a smaller or filtered table.'
+                );
+            }
+
+            $lines = [
+                'Source: ' . $source->name,
+                'AppSheet Table: ' . $tableName,
+                'Records: ' . count($rows),
+                '',
+            ];
+
+            $validRows = 0;
+
+            foreach ($rows as $rowNumber => $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+
+                $validRows++;
+                $lines[] = 'Record ' . ($rowNumber + 1);
+
+                foreach ($row as $field => $value) {
+                    if ($value === null || $value === '') {
+                        continue;
+                    }
+
+                    if (is_bool($value)) {
+                        $value = $value ? 'Yes' : 'No';
+                    } elseif (is_scalar($value)) {
+                        $value = (string) $value;
+                    } else {
+                        $value = json_encode(
+                            $value,
+                            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                        ) ?: '';
+                    }
+
+                    $value = trim(mb_substr($value, 0, 3000, 'UTF-8'));
+
+                    if ($value !== '') {
+                        $lines[] = trim((string) $field) . ': ' . $value;
+                    }
+                }
+
+                $lines[] = '';
+            }
+
+            if ($validRows === 0) {
+                return $this->fail(
+                    $source,
+                    'AppSheet did not return usable table records.'
+                );
+            }
+
+            $text = trim(implode("\n", $lines));
+
+            if ($text === '' || strlen($text) > self::MAX_RESPONSE_BYTES) {
+                return $this->fail(
+                    $source,
+                    'AppSheet data could not be prepared for indexing.'
+                );
+            }
+
+            // Use a new file for each sync. The previous successful index
+            // remains untouched until the new index has completed.
+            $newPath = 'chatbot-knowledge/appsheet/'
+                . $source->id . '/sync-'
+                . bin2hex(random_bytes(8)) . '.txt';
+
+            if (!Storage::disk('local')->put($newPath, $text)) {
+                return $this->fail(
+                    $source,
+                    'Unable to save the AppSheet data. Check storage space.'
+                );
+            }
+
+            $result = $indexer->indexDocument([
+                'source_id' => $source->id,
+                'title' => $source->name . ' - AppSheet ' . $tableName,
+                'storage_disk' => 'local',
+                'storage_path' => $newPath,
+                'document_type' => 'data',
+                'source_key' => 'appsheet-' . $source->id,
+                'source_url' => $source->source_url,
+                'mime_type' => 'text/plain',
+                'metadata' => [
+                    'source_type' => 'appsheet',
+                    'table_name' => $tableName,
+                    'row_count' => $validRows,
+                    'synced_at' => now()->toIso8601String(),
+                ],
+            ]);
+
+            if (!in_array($result['status'] ?? '', ['indexed', 'unchanged'], true)) {
+                Storage::disk('local')->delete($newPath);
+                $newPath = null;
+
+                return $this->fail(
+                    $source,
+                    'AppSheet data could not be indexed. Check the source and try again.'
+                );
+            }
+
+            $oldPath = $source->storage_disk === 'local'
+                ? $source->storage_path
+                : null;
+
+            if (($result['status'] ?? '') === 'unchanged') {
+                $savedPath = $result['document']->storage_path;
+                Storage::disk('local')->delete($newPath);
+                $newPath = null;
+            } else {
+                $savedPath = $newPath;
+                $newPath = null;
+            }
+
+            $source->forceFill([
+                'storage_disk' => 'local',
+                'storage_path' => $savedPath,
+                'status' => 'indexed',
+                'last_checked_at' => now(),
+                'last_error' => null,
+            ])->save();
+
+            if ($oldPath && $oldPath !== $savedPath) {
+                Storage::disk('local')->delete($oldPath);
+            }
+
+            return [
+                'status' => 'indexed',
+                'rows' => $validRows,
+                'chunks' => (int) ($result['chunks'] ?? 0),
+            ];
+        } catch (Throwable $e) {
+            if ($newPath) {
+                Storage::disk('local')->delete($newPath);
+            }
+
+            // Never write the request headers, AppSheet key, or response body
+            // to the application log.
+            Log::warning('AppSheet knowledge sync failed.', [
+                'source_id' => $source->id,
+                'exception' => get_class($e),
+            ]);
+
+            return $this->fail(
+                $source,
+                'AppSheet sync failed. Check the source settings and try again.'
+            );
+        }
+    }
+
+    private function fail(
+        ChatbotKnowledgeSource $source,
+        string $message
+    ): array {
+        $source->forceFill([
+            'status' => 'failed',
+            'last_checked_at' => now(),
+            'last_error' => $message,
+        ])->save();
+
+        return [
+            'status' => 'failed',
+            'message' => $message,
+        ];
+    }
+}

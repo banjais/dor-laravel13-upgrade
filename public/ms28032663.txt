@@ -1,0 +1,5 @@
+﻿{
+  "Description": "Domain ownership verification file for Microsoft 365 - place in the website root",
+  "Domain": "dor.gov.np",
+  "Id": "3af94eb4-0499-4b88-810e-0932200b657f"
+}

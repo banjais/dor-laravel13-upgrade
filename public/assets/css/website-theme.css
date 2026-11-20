@@ -1,0 +1,133 @@
+/* DoR Global Website Theme - Legacy Layout */
+:root {
+    --theme-page-bg: #F5F6F4;
+    --theme-card-bg: #FFFFFF;
+    --theme-header-bg: #142D4E;
+    --theme-nav-bg: #1769AA;
+    --theme-accent: #8B2635;
+    --theme-footer-bg: #263746;
+    --theme-text: #263238;
+    --theme-border: #E5E8E6;
+}
+
+body,
+.boxed {
+    background-color: var(--theme-page-bg);
+    color: var(--theme-text);
+}
+
+.header-full {
+    background: var(--theme-header-bg);
+    color: #FFFFFF;
+}
+
+.header-full-title h1,
+.header-full-title h1 a,
+.header-full-title h1 span,
+.header-full-title h1 span a,
+.header-full-title p {
+    color: #FFFFFF;
+}
+
+.navbar-header-full {
+    background-color: var(--theme-nav-bg);
+    background-image: none;
+}
+
+.navbar-header-full .navbar-nav > li > a {
+    color: #FFFFFF;
+}
+
+.navbar-header-full .navbar-nav > li > a:hover,
+.navbar-header-full .navbar-nav > li > a:focus,
+.navbar-header-full .navbar-nav > .active > a {
+    background-color: var(--theme-accent);
+    color: #FFFFFF;
+}
+
+.navbar-header-full .dropdown-menu {
+    background-color: var(--theme-nav-bg);
+    border-color: var(--theme-border);
+}
+
+.navbar-header-full .dropdown-menu > li > a {
+    color: #FFFFFF;
+}
+
+.navbar-header-full .dropdown-menu > li > a:hover,
+.navbar-header-full .dropdown-menu > li > a:focus {
+    background-color: var(--theme-accent);
+    color: #FFFFFF;
+}
+
+.content-box.box-default {
+    background-color: var(--theme-card-bg);
+    border-color: var(--theme-border);
+}
+
+.content-box.box-default:hover {
+    background-color: var(--theme-page-bg);
+}
+
+#footer-widgets,
+#footer {
+    background-color: var(--theme-footer-bg);
+    color: #FFFFFF;
+    border-color: var(--theme-footer-bg);
+}
+
+.footer-widget-title {
+    color: #FFFFFF;
+}
+
+#footer-widgets a,
+#footer a {
+    color: #FFFFFF;
+}
+
+#footer-widgets a:hover,
+#footer a:hover {
+    color: var(--theme-accent);
+}
+
+/* Single-row adaptive navigation for legacy DoR headers */
+@media (min-width: 1025px) {
+    #header #cssmenu {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #header #cssmenu > ul.navbar-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center;
+        justify-content: space-between;
+        float: none !important;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        white-space: nowrap;
+    }
+
+    #header #cssmenu > ul.navbar-nav > li {
+        display: block;
+        float: none !important;
+        flex: 0 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    #header #cssmenu > ul.navbar-nav > li > a {
+        padding: 10px clamp(2px, .35vw, 8px) !important;
+        font-size: clamp(8px, .72vw, 12px) !important;
+        line-height: 1.2;
+        letter-spacing: 0;
+        white-space: nowrap !important;
+    }
+
+    #header #cssmenu > ul.navbar-nav > li > ul {
+        z-index: 2050;
+    }
+}
