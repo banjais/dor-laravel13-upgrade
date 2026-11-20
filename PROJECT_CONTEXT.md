@@ -252,3 +252,26 @@ Mandatory safety before syncing:
 - Next diagnostic should be read-only and concise: `git remote -v`, `git branch -vv`, `git log -1 --oneline`, `git diff --stat`, and counts of modified/untracked/deleted files. Avoid printing secrets.
 - Before any reconciliation, create and verify a full local backup outside the repository, or another equally reliable recovery point. Then compare local `master` with GitHub `main` and plan a non-destructive integration.
 - The user wants PC + ChatGPT + GitHub working together today, while they view the local live site. Do not claim PC synchronization until a real local pull/sync is performed and verified.
+
+
+## 14. Local Git remote and working-tree inspection — 2026-11-20
+
+User supplied additional read-only diagnostics from the local WSL checkout at `/mnt/d/DoR-Website-Backup/Laravel13-Upgrade`.
+
+Verified output:
+- Current branch: `master`.
+- Latest local commit: `2e44a75 fix: use Nepal timezone for Laravel`.
+- `git branch -vv` showed no upstream/tracking branch for local `master`.
+- Local `origin` fetch/push URL is `git@gitlab.com:sangamu/dor-website-8.git` (GitLab), not the GitHub upgrade repository.
+- Tracked diff summary: 137 files changed, 10,310 insertions, 5,661 deletions.
+- Status summary command reported 135 modified/added, 604 untracked, and 2 deleted.
+- The untracked list includes many backup copies, temporary audit/output files, private/environment backup files, uploads, and some stray files with names resembling shell output fragments. Treat all as untrusted/unreviewed; do not bulk-stage.
+- This confirms the local checkout's Git origin and branch do not currently match the GitHub upgrade repository/branch recorded above. The relationship between this GitLab checkout and the GitHub upgrade repository is not yet established.
+
+Next safe steps:
+1. Do not change the local origin, pull, merge, reset, clean, stash, or push yet.
+2. Confirm whether the user intends this WSL folder to become a working copy of `banjais/dor-laravel13-upgrade`, or whether it is a separate original GitLab project whose Laravel 13 work needs selective migration.
+3. Inspect GitHub repository history/tree and compare with the local base commit before choosing any integration method.
+4. Create and verify a complete local backup outside the repository before any operation that changes the working tree.
+5. Establish a safe allowlist of intended source files; explicitly exclude `.env*`, backup artifacts, dumps, uploads/private data, temporary outputs, and credentials.
+6. Only after user intent and repository relationship are clear, configure a non-destructive sync path. Never claim local PC sync until verified.
