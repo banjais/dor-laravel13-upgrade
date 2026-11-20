@@ -315,3 +315,15 @@ Current local storage diagnostics:
 - D: mounted at `/mnt/d`: 463 GB total, 427 GB used, 37 GB available (93% used).
 - Backup parent `/mnt/d/DoR-Website-Backup` exists.
 - Do not create a second full 17 GB backup on D: without checking capacity and planning. First inspect E: available space and retrieve/compile the prior D:/E: inspected-path inventory. Do not start bulk transfers yet.
+
+
+## 18. D:/E: drive inventory checkpoint — 2026-11-20
+
+Latest WSL read-only diagnostics:
+- D: (`/mnt/d`): 463 GB total, 427 GB used, 37 GB available (93%). Root entries include `Dirves`, `DoR-Website-Backup`, `Recovery`, `tmp`, and root-level `ChatbotSettingController.php`. `System Volume Information` permission warning is expected; do not try to access protected system files.
+- E: (`/mnt/e`): 469 GB total, 353 GB used, 117 GB available (76%). Root entries include `Dirve`, `DoR-Website-Backup`, and `DoR-Website-Backup-Upgrade-Data`; Windows protected files such as `pagefile.sys`, `DumpStack.log.tmp`, and `System Volume Information` are inaccessible and must be excluded.
+- D: project folder `/mnt/d/DoR-Website-Backup/Laravel13-Upgrade` exists and is the current working project (17 GB excluding `.git`). Prior check on 2026-11-15 found `E:\DoR-Website-Backup\Laravel13-Upgrade` did not exist.
+- Prior conversation lookup confirms the D:/E: root folder names and the D: project path, but did not recover nested file inventories, sizes, timestamps, exact intended transfer destinations, or exclusions. Do not claim those nested contents have already been inspected or decide transfer scope by guessing.
+- `D:\Dirves` and `E:\Dirve` are differently named folders; do not assume they are duplicates or rename/merge them without inspecting contents.
+- `E:\DoR-Website-Backup-Upgrade-Data` is a separate E: root folder and must be inventoried as a potential source of upgrade data before transfer.
+- Next: read-only inventory of the named user-data folders on D: and E: (names, sizes, file counts, timestamps); exclude Windows protected/system entries. Compare manifests and available destinations before any copy. Preserve all source files until destination verification.
