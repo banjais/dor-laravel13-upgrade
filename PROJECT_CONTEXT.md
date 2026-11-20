@@ -293,3 +293,14 @@ This confirms the desired end state, but does NOT authorize destructive replacem
 - Keep `.env*`, credentials, database dumps, private uploads, backup copies, temporary outputs, and other sensitive/local-only files out of GitHub.
 - Plan a non-destructive integration so the local site can continue running. Only report PC sync after the user runs the safe local sync operation and the resulting branch/status/commit are verified.
 - Desired final state: this same local folder tracks GitHub `main`; the user can keep the local development server/browser running to inspect the site while development proceeds.
+
+
+## 16. GitHub main inspection after folder confirmation — 2026-11-20
+
+After the user confirmed the existing local folder should become the canonical GitHub working folder:
+- Updated and re-read this context file; confirmation is recorded in section 15.
+- GitHub `main` currently points to commit `5d382724506dc4f628a5b7537f163e0a0fa2c005` (the latest context documentation commit at this checkpoint).
+- GitHub `main` has a populated Laravel application tree, including app/controllers, migrations, views, tests and assets. The root README is still the generic Laravel README and is not a reliable project-specific handover.
+- A GitHub compare request using local base commit `2e44a75` against this repository's `main` returned 404. Therefore that local commit is not currently resolvable as a commit in this GitHub repository; no common history has been established.
+- Do not infer that the local and GitHub trees are identical just because file paths overlap. Compare actual files and histories before reconciliation.
+- Next user-side step should remain read-only: check available disk space and current folder size so a full external backup can be planned. Do not modify Git remotes or the working tree yet.
