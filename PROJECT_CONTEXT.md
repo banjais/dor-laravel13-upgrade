@@ -208,3 +208,26 @@ Keep this section as a decision log, not just a technical status summary. It hel
 - When a decision changes, preserve the old decision as superseded and record the new one; do not erase history that explains why code is the way it is.
 - Do not record secrets, personal sensitive information, or unnecessary private details.
 - Keep technical implementation status separate from user intent: a requested feature is not “completed” until implementation and testing are verified.
+
+
+## 12. User-requested fast autonomous development workflow (confirmed 2026-11-20)
+
+The user explicitly requests that, when they ask for project work, the assistant should follow this order without waiting for repeated instructions:
+
+1. **Update project memory first:** record the new request, constraints, and intended outcome in `PROJECT_CONTEXT.md` on GitHub before starting implementation.
+2. **Read it back:** fetch and read the updated `PROJECT_CONTEXT.md` from GitHub in the same work session, then use it as the working brief.
+3. **Inspect and analyze:** inspect the relevant repository files, related Blade/CSS/JS/routes/controllers/tests as appropriate, and current GitHub state before editing.
+4. **Implement promptly:** make focused changes in the related files. The user permits the assistant to make reasonable implementation decisions and does not require asking about every minor detail. Ask only when a decision is consequential, ambiguous, risky, or could affect data/security/production.
+5. **Verify:** review the diff and run available targeted tests/checks. Never claim a test or browser check was run unless it actually was.
+6. **Publish:** commit and push approved, verified code changes to the GitHub repository/branch. Prefer a focused branch and PR for substantial or risky work; do not force-push or overwrite unrelated work.
+7. **Keep the user informed:** state what changed, commit SHA, tests, and what still needs local visual verification.
+
+### Today's requested sync scope and limits
+
+- For the current work session, the desired shared workflow is **ChatGPT conversation + GitHub + the user's own PC/local live site**.
+- The user wants to view the local live website on their PC while the assistant works.
+- The assistant can read and write the GitHub repository through the connected GitHub app, subject to the granted repository permissions.
+- The assistant cannot directly operate the user's PC, local WSL filesystem, browser, Git working tree, or local server from an ordinary chat. A GitHub commit does not itself synchronize files into the PC working copy. Local synchronization requires a configured Git client/automation or a user-run `git pull`/sync step. Do not claim the PC is synced until verified.
+- The user also wants changes sent to a new VM eventually. That is a later stage; no VM deployment or production action is authorized merely by this workflow request. First verify VM access, deployment method, backups, environment, and obtain explicit approval before any VM deployment.
+- Do not store credentials, tokens, SSH keys, or private connection details in this file or the repository.
+- Do not create insecure auto-deploy credentials or expose a local development server publicly just to achieve synchronization.
