@@ -231,3 +231,24 @@ The user explicitly requests that, when they ask for project work, the assistant
 - The user also wants changes sent to a new VM eventually. That is a later stage; no VM deployment or production action is authorized merely by this workflow request. First verify VM access, deployment method, backups, environment, and obtain explicit approval before any VM deployment.
 - Do not store credentials, tokens, SSH keys, or private connection details in this file or the repository.
 - Do not create insecure auto-deploy credentials or expose a local development server publicly just to achieve synchronization.
+
+
+## 13. Local PC Git status checkpoint — 2026-11-20
+
+User supplied the WSL output of `git status --short --branch` from:
+`/mnt/d/DoR-Website-Backup/Laravel13-Upgrade`
+
+Observed facts:
+- Local checked-out branch is `master`, while the GitHub project handover/source branch is `main`.
+- The local working tree is heavily modified and has many untracked files/directories, including application code, controllers, models, migrations, tests, Blade views, CSS/JS, PWA assets, backup files, and temporary/audit artifacts.
+- The output includes multiple environment backup files (for example `.env.bak`, `.env.before-local-db`, `.env.pre-...`). These must be treated as sensitive and must never be staged, committed, uploaded, or printed.
+- There are deleted tracked files as well as modified tracked files.
+- This local tree contains substantial work not yet reconciled with GitHub. Do not assume that GitHub `main` is a complete mirror of this local tree.
+
+Mandatory safety before syncing:
+- Do NOT run `git pull`, `git reset`, `git clean`, `git checkout` over the working tree, `git stash` (unless carefully scoped and verified), or bulk `git add .` / `git add -A`.
+- Do not merge or overwrite local work until remotes, branch tracking, commit divergence, and a complete safe backup are understood.
+- Never commit any `.env*`, credentials, database dumps, private uploads, temporary command-output files, or backup artifacts merely because they are untracked.
+- Next diagnostic should be read-only and concise: `git remote -v`, `git branch -vv`, `git log -1 --oneline`, `git diff --stat`, and counts of modified/untracked/deleted files. Avoid printing secrets.
+- Before any reconciliation, create and verify a full local backup outside the repository, or another equally reliable recovery point. Then compare local `master` with GitHub `main` and plan a non-destructive integration.
+- The user wants PC + ChatGPT + GitHub working together today, while they view the local live site. Do not claim PC synchronization until a real local pull/sync is performed and verified.
